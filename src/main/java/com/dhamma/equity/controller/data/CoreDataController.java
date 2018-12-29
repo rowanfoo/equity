@@ -1,15 +1,17 @@
 package com.dhamma.equity.controller.data;
 
 import com.dhamma.equity.data.entity.CoreData;
+import com.dhamma.equity.data.entity.CoreStock;
 import com.dhamma.equity.service.data.CoreDataService;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/data")
@@ -19,9 +21,14 @@ public class CoreDataController {
     CoreDataService coreDataService;
 
 ///get all ? code , data_when
-    @RequestMapping()
+    @GetMapping("")
     //@CrossOrigin(origins = "http://localhost:8090")
     @CrossOrigin
+
+    @ApiOperation(value = "Get Data for date",  notes = "Get stock data (price and etc) for a date")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Success", response = CoreData[].class),
+    })
     public Iterable<CoreData> getDataFrom(@RequestParam String code, @RequestParam String date ){
         return coreDataService.getDataFrom(code,date );
     }
@@ -29,8 +36,12 @@ public class CoreDataController {
 
 
     @CrossOrigin
-    @RequestMapping("/stocks")
-    public Iterable<CoreData> getDataStockDate(@RequestParam String stocks, @RequestParam String date ){
+    @GetMapping("/stocks")
+    @ApiOperation(value = "Get  all stockS , price data base on DATE ",  notes = "Get  all stockS separate by \",\"  for its price data ")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Success", response = CoreData[].class),
+    })
+    public Iterable<CoreData> getDataStockDate(@ApiParam(required = true, name = "stocks", value = "comma separated stock code")@RequestParam String stocks, @RequestParam String date ){
 
         System.out.println("--------------getDataStockDate ------------" + stocks);
 
@@ -44,7 +55,7 @@ public class CoreDataController {
 
 
     @CrossOrigin
-    @RequestMapping("/clearcache")
+    @GetMapping("/clearcache")
     public String  clearCache(){
         coreDataService.clearcache();
         return "done";
